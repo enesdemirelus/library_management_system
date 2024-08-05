@@ -27,7 +27,7 @@ class LoginScreen(tk.Tk):
             self.last_id = 0
 
 
-        self.geometry("420x200")
+        self.geometry("420x200+700+300")
         self.title("Welcome to Demirel Library!")
         self.resizable(False, False)
         
@@ -118,6 +118,8 @@ class LoginScreen(tk.Tk):
                     con.commit()
                     showinfo(message= f"Your acccount has been created! \n \n Your Username: {username} \n \n Your ID: {id}")
                     self.password_entry.delete(0, END)
+                    cur.execute("SELECT name FROM userdatabase")
+                    self.member_names = [row[0] for row in cur.fetchall()]
                 else:
                     showerror(message= "This username is already in the system!")
                     self.username_entry.delete(0, END)
