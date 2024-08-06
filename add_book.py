@@ -27,7 +27,14 @@ class addBook(tk.Toplevel):
 
         self.image = self.load_and_resize_image("default_image.png", (250, 375))
 
-        self.geometry("700x400")
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        width = 700
+        height = 400
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2 - 200
+        self.geometry(f"{width}x{height}+{x}+{y}")
+        
         self.title("Add Book")
         self.resizable(False, False)
 
@@ -105,7 +112,10 @@ class addBook(tk.Toplevel):
         book_language = self.book_language_str.get()
         book_page_count = self.page_count_str.get()
         if book_title and book_author and book_genre and book_language and book_page_count and self.file_path != "":
-            self.cur.execute('INSERT INTO book_properties (image_path, title, author, genre, language, page, is_taken, who_took) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (self.file, book_title, book_author, book_genre, book_language, book_page_count, "False", "In the Stock!"))
+            self.cur.execute('INSERT INTO book_properties (image_path, title, author, genre, language, page, is_taken, who_took, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (self.file, book_title, book_author, book_genre, book_language, book_page_count, "False", "In the Stock!", "-"))
             self.con.commit()
         else:
             showerror(message= "Please enter all the field and put an image!")
+
+
+addBook()

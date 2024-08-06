@@ -3,8 +3,6 @@ from tkinter import ttk, END
 from ttkbootstrap import Style
 import sqlite3
 from tkinter.messagebox import showerror, showinfo
-import add_book
-import all_books
 
 class LoginScreen(tk.Tk):
     def __init__(self):
@@ -31,7 +29,13 @@ class LoginScreen(tk.Tk):
         else:
             self.last_id = 0
 
-        self.geometry("420x200+700+300")
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        width = 420
+        height = 200
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2 - 200
+        self.geometry(f"{width}x{height}+{x}+{y}")
         self.title("Welcome to Demirel Library!")
         self.resizable(False, False)
         
