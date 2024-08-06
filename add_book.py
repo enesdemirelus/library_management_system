@@ -4,15 +4,19 @@ from ttkbootstrap import Style
 from PIL import Image, ImageTk
 import sqlite3
 from tkinter import filedialog
+import os
 from tkinter.messagebox import showerror, showinfo
 
-class addBook(tk.Tk):
+class addBook(tk.Toplevel):
     def __init__(self):
         super().__init__()
 
         self.file_path = ""
         style = Style(theme='united')
         style.master = self
+
+        self.con = sqlite3.connect('library.db')
+        self.cur = self.con.cursor()
 
         self.book_name_str = tk.StringVar()
         self.book_author_str = tk.StringVar()
@@ -38,7 +42,6 @@ class addBook(tk.Tk):
         self.mainloop()
 
     def load_and_resize_image(self, filepath, size):
-        """Load and resize an image using Pillow."""
         pil_image = Image.open(filepath)
         pil_image = pil_image.resize(size, Image.LANCZOS)
         return ImageTk.PhotoImage(pil_image)
@@ -46,7 +49,8 @@ class addBook(tk.Tk):
     def select_file(self, event):
         self.file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png")])
         if self.file_path:
-            self.image = self.load_and_resize_image(f"{self.file_path}", (250, 375))
+            self.file = os.path.basename(self.file_path)
+            self.image = self.load_and_resize_image(f"{self.file}", (250, 375))
             self.image_widgets()
 
     def image_widgets(self):
@@ -101,10 +105,7 @@ class addBook(tk.Tk):
         book_language = self.book_language_str.get()
         book_page_count = self.page_count_str.get()
         if book_title and book_author and book_genre and book_language and book_page_count and self.file_path != "":
-            print("success")
+            self.cur.execute('INSERT INTO book_properties (image_path, title, author, genre, language, page, is_taken, who_took) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (self.file, book_title, book_author, book_genre, book_language, book_page_count, "False", "In the Stock!"))
+            self.con.commit()
         else:
             showerror(message= "Please enter all the field and put an image!")
-
-
-if __name__ == "__main__":
-    addBook()
