@@ -4,7 +4,10 @@ from ttkbootstrap import Style
 import sqlite3
 from tkinter.messagebox import showerror, showinfo
 
-class LoginScreen(tk.Tk):
+import admin_dashboard
+import user_dashboard
+
+class LoginScreen(tk.Toplevel):
     def __init__(self):
         super().__init__()
 
@@ -52,9 +55,9 @@ class LoginScreen(tk.Tk):
 
     def creating_widgets(self):
         self.welcome_text = ttk.Label(self, text="Welcome! Please enter your user details.", font="inconsolata 18")
-        self.username_text = ttk.Label(self, text="Please enter your username:", font="inconsolata 13")
+        self.username_text = ttk.Label(self, text="Please enter your username:", font="inconsolata 14")
         self.username_entry = ttk.Entry(self, textvariable=self.username_var)
-        self.password_text = ttk.Label(self, text="Please enter your password:", font="inconsolata 13")
+        self.password_text = ttk.Label(self, text="Please enter your password:", font="inconsolata 14")
         self.password_entry = ttk.Entry(self, textvariable=self.password_var, show='*')
         self.user_select = ttk.Radiobutton(self, text="USER", value=0, variable=self.radio_button_var, command=self.for_radio_buttons, style="Custom.TRadiobutton")
         self.admin_select = ttk.Radiobutton(self, text="ADMIN", value=1, variable=self.radio_button_var, command=self.for_radio_buttons, style="Custom.TRadiobutton")
@@ -96,11 +99,19 @@ class LoginScreen(tk.Tk):
                     elif adminValue == 0 and isAdmin == 1:
                         showerror(message="You are not admin!")
                         self.radio_button_var.set(0)
+                        self.signup_button.config(state= "enabled")
                     else:
-                        self.withdraw() 
-                        add_book_window = all_books.allBooks()
-                        add_book_window.wait_window()
-                        self.deiconify()
+                        if isAdmin == 1:
+                            self.withdraw() 
+                            add_book_window = admin_dashboard.adminDashboard(username)
+                            add_book_window.wait_window()
+                            self.deiconify()
+                        else:
+                            self.withdraw() 
+                            add_book_window = user_dashboard.userDashboard(username)
+                            add_book_window.wait_window()
+                            self.deiconify()
+                            
                 else:
                     showerror(message="There is no user with this username!")
                     self.username_entry.delete(0, END)
@@ -142,7 +153,3 @@ class LoginScreen(tk.Tk):
             self.signup_button.config(state="disabled")
         else:
             self.signup_button.config(state="enabled")
-
-
-if __name__ == "__main__":
-    LoginScreen()

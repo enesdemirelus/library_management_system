@@ -2,16 +2,14 @@ import tkinter as tk
 from tkinter import ttk
 import sqlite3
 import user_dashboard
-import admin_dashboard
 from ttkbootstrap import Style
 
 
-class AllBooks(tk.Toplevel):
-    def __init__(self, location, username):
+class MyBooks(tk.Toplevel):
+    def __init__(self,username):
         super().__init__()
  
         self.books = []
-        self.location = location
         self.username = username
         
         screen_width = self.winfo_screenwidth()
@@ -21,7 +19,7 @@ class AllBooks(tk.Toplevel):
         x = (screen_width - width) // 2
         y = (screen_height - height) // 2 - 100
         self.geometry(f"{width}x{height}+{x}+{y}")
-        self.title("All Books in the Demirel Library!")
+        self.title("My Books")
         self.resizable(False, False)
 
         self.rowconfigure(0, weight=9)
@@ -34,6 +32,8 @@ class AllBooks(tk.Toplevel):
         self.getting_books()
         self.creating_table()
         self.packing_table()
+
+        self.mainloop()
 
     def creating_table(self):
         self.table = ttk.Treeview(
@@ -75,20 +75,14 @@ class AllBooks(tk.Toplevel):
     def getting_books(self):
         connection = sqlite3.connect("library.db")
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM book_properties")
+        cursor.execute("SELECT * FROM book_properties WHERE who_took = ?", (self.username,))
         rows = cursor.fetchall()
         connection.close()
 
         self.books.extend(rows)
 
     def go_back(self):
-        if self.location == "user":
-            self.withdraw() 
-            add_book_window = user_dashboard.userDashboard(self.username)
-            add_book_window.wait_window()
-            self.deiconify()
-        elif self.location == "admin":
-            self.withdraw() 
-            add_book_window = admin_dashboard.adminDashboard(self.username)
-            add_book_window.wait_window()
-            self.deiconify()
+        self.withdraw() 
+        add_book_window = user_dashboard.userDashboard(self.username)
+        add_book_window.wait_window()
+        self.deiconify()

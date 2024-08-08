@@ -6,14 +6,17 @@ import sqlite3
 from tkinter import filedialog
 import os
 from tkinter.messagebox import showerror, showinfo
+import admin_dashboard
 
 class addBook(tk.Toplevel):
-    def __init__(self):
+    def __init__(self, username):
         super().__init__()
 
         self.file_path = ""
         style = Style(theme='united')
         style.master = self
+
+        self.username = username
 
         self.con = sqlite3.connect('library.db')
         self.cur = self.con.cursor()
@@ -34,6 +37,7 @@ class addBook(tk.Toplevel):
         x = (screen_width - width) // 2
         y = (screen_height - height) // 2 - 200
         self.geometry(f"{width}x{height}+{x}+{y}")
+        style.configure('Medium.TButton', font=('inconsolata', 13))
         
         self.title("Add Book")
         self.resizable(False, False)
@@ -88,8 +92,9 @@ class addBook(tk.Toplevel):
         self.book_page_count = ttk.Label(self.right_frame, text= "Enter the book page count: ", font= "inconsolata 15")
         self.book_page_count_entry = ttk.Entry(self.right_frame, textvariable= self.page_count_str)
 
-        self.add_button = ttk.Button(self.right_frame, text= "Click to add!", command= self.addbook_clicked)
+        self.add_button = ttk.Button(self.right_frame, text= "Click to add!", command= self.addbook_clicked, style="Medium.TButton")
 
+        self.previous_menu_button = ttk.Button(self.right_frame, text = "Previous Menu", command= self.previous_menu, style="Medium.TButton")
     def packing_widgets(self):
         self.right_frame.grid(row = 0, column= 1)
         self.biglabel.grid(row = 0, column= 0, columnspan= 2, pady= 20)
@@ -103,7 +108,8 @@ class addBook(tk.Toplevel):
         self.book_language_entry.grid(row = 4, column= 1, padx = (0,10))
         self.book_page_count.grid(row = 5, column= 0, pady= 10)
         self.book_page_count_entry.grid(row = 5, column=1, padx = (0,10))
-        self.add_button.grid(row = 6, column= 0, columnspan=2, pady= 10)
+        self.add_button.grid(row = 6, column= 0, pady= 10)
+        self.previous_menu_button.grid(row = 6, column= 1, pady= 10)
 
     def addbook_clicked(self):
         book_title = self.book_name_str.get()
@@ -114,8 +120,19 @@ class addBook(tk.Toplevel):
         if book_title and book_author and book_genre and book_language and book_page_count and self.file_path != "":
             self.cur.execute('INSERT INTO book_properties (image_path, title, author, genre, language, page, is_taken, who_took, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (self.file, book_title, book_author, book_genre, book_language, book_page_count, "False", "In the Stock!", "-"))
             self.con.commit()
+            showerror(message= "Book has been added to the database!")
+            self.book_name_entry.delete(0, END)
+            self.book_author_entry.delete(0, END)
+            self.book_genre_entry.delete(0, END)
+            self.book_language_entry.delete(0, END)
+            self.book_page_count_entry.delete(0, END)
+            self.image = self.load_and_resize_image("default_image.png", (250, 375))
+            self.image_widgets()
         else:
             showerror(message= "Please enter all the field and put an image!")
-
-
-addBook()
+        
+    def previous_menu(self):
+        self.withdraw() 
+        add_book_window = admin_dashboard.adminDashboard(self.username)
+        add_book_window.wait_window()
+        self.deiconify()
