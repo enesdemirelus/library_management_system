@@ -1,5 +1,7 @@
 # library_management_system
 
+Video: https://www.youtube.com/watch?v=b5RazIDovmw
+
 This project is a personal project I worked in my free time as to practise Tkinter, Python and SQLite3. I aimed to create a fully functional Library Management Software for both library employees and regular users.
 
 The software has these features for admins:
